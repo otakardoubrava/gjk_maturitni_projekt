@@ -1,8 +1,8 @@
 import sys
 pins = {1: 1, 2: 0, 3: 1, 4: 1}
-#src = "$1an$4an$3an$2"
-src = input("> ")
-lssrc = list(src)
+known_characters = {"$", "&", "/", "(", ")"}
+operators = {}
+integer_operators = {"$"}
 
 
 class BinAnd:
@@ -33,7 +33,7 @@ class Pin:
     v_ = 0
 
     def __init__(self, v):
-        self.v_ = v
+        self.v_ = int(v)
 
     def evaluate(self):
         if pins[self.v_] == 1:
@@ -42,143 +42,133 @@ class Pin:
             return False
 
 
-def splice_expression(lssrc):
+def splice_expression(source_list, operators):
     i = 0
     number_of_brackets = 0
-    splexp = []
+    spliced_expression = []
 
-    while i < len(lssrc):
+    if source_list[0] not in operators:
+        print("syntax error")
+        sys.exit()
 
-        if lssrc[i] == "$":
-            pindigit = 2
-            try:
-                int(lssrc[i+1])
-            except:
-                print("syn err on pos " + str(i+1))
-                sys.exit()
+    while i < len(source_list):
+        element = ""
+        if source_list[i] in operators:
+            if source_list[i] == "(":
+                spliced_expression.append("(")
+                number_of_brackets = number_of_brackets + 1
+            elif source_list[i] == ")":
+                spliced_expression.append(")")
+                number_of_brackets = number_of_brackets - 1
             else:
-                try:
-                    int(lssrc[i+2])
-                except:
-                    pindigit = 1
-
-            if pindigit == 1:
-                splexp.append(lssrc[i] + lssrc[i+1])
+                element = element + source_list[i]
                 i = i+1
-            else:
-                splexp.append(lssrc[i] + lssrc[i + 1] + lssrc[i + 2])
-                i = i+2
-
-        elif lssrc[i] == "a":
-            if lssrc[i+1] != "n":
-                print("syn err on pos " + str(i+1))
-                sys.exit()
-            else:
-                splexp.append("and")
-                i = i+1
-
-        elif lssrc[i] == "o":
-            if lssrc[i+1] != "r":
-                print("syn err on pos " + str(i+1))
-                sys.exit()
-            else:
-                splexp.append("or")
-                i = i+1
-
-        elif lssrc[i] == "(":
-            splexp.append("(")
-            number_of_brackets = number_of_brackets + 1
-
-        elif lssrc[i] == ")":
-            splexp.append(")")
-            number_of_brackets = number_of_brackets - 1
-
-        else:
-            print("syn err on pos " + str(i))
-            sys.exit()
+                while i < len(source_list):
+                    if source_list[i] in operators:
+                        spliced_expression.append(element)
+                        i = i - 1
+                        break
+                    elif i+1 == len(source_list):
+                        element = element + source_list[i]
+                        spliced_expression.append(element)
+                        break
+                    else:
+                        element = element + source_list[i]
+                        i = i + 1
 
         i = i+1
+
     if number_of_brackets != 0:
         print("err no end to ( " + str(i))
         sys.exit()
-    return splexp
+    return spliced_expression
 
 
-def assemble_tree(splexp, beg, end):
+#def check_for_syntax_error():
+
+
+def assemble_tree(spliced_expression, beg, end):
     tree = []
-    braklist = []
+    bracket_list = []
     for i in range(beg, end):
-        if splexp[i] == "(":
-            braklist.append(i)
-        elif splexp[i] == ")":
-            if len(braklist) > 1:
-                braklist.pop(-1)
-            elif len(braklist) == 1:
-                tree.append(assemble_tree(splexp, braklist[0]+1, i))
-                braklist.pop(-1)
+        if spliced_expression[i] == "(":
+            bracket_list.append(i)
+        elif spliced_expression[i] == ")":
+            if len(bracket_list) > 1:
+                bracket_list.pop(-1)
+            elif len(bracket_list) == 1:
+                tree.append(assemble_tree(spliced_expression, bracket_list[0] + 1, i))
+                bracket_list.pop(-1)
         else:
-            if len(braklist) == 0:
-                tree.append(splexp[i])
+            if len(bracket_list) == 0:
+                tree.append(spliced_expression[i])
     return tree
 
 
-def assemble_class_tree(tree):
-    class_list = []
+def assemble_object_tree(tree):
+    object_list = []
     for i in range(0, len(tree)):
-        optest = list(tree[i])
-
+        operator_test = list(tree[i])
 
         if type(tree[i]) == list:
-            class_list.append(assemble_class_tree(tree[i]))
+            object_list.append(assemble_object_tree(tree[i]))
 
-        elif optest[0] == "$":
-            if len(optest) == 2:
-                clss = Pin(int(optest[1]))
+        elif operator_test[0] == "$":
+            if len(operator_test) == 2:
+                klass = Pin(operator_test[1])
+            elif len(operator_test) > 3:
+                print("syntax error")
+                sys.exit()
             else:
-                clss = Pin(int(optest[1]+optest[2]))
-            class_list.append(clss)
+                klass = Pin(operator_test[1]+operator_test[2])
+            object_list.append(klass)
 
         else:
-            class_list.append(tree[i])
+            object_list.append(tree[i])
 
-        clss = compact_class_list(class_list)
+        klass = compact_object_list(object_list)
 
-        if clss != 0:
-            class_list[0] = clss
-            class_list.pop(1)
-            if len(class_list) != 1:
-                class_list.pop(1)
+        if klass != 0:
+            object_list[0] = klass
+            object_list.pop(1)
+            if len(object_list) != 1:
+                object_list.pop(1)
 
-    if len(class_list) == 1:
-        cl = class_list[0]
+    if len(object_list) == 1:
+        final_object = object_list[0]
     else:
         print("Exp err")
-        print(class_list)
+        print(object_list)
         sys.exit()
-    return cl
+    return final_object
 
 
-def compact_class_list(class_list):
-    clss=0
+def compact_object_list(object_list):
+    klass = 0
 
-    if len(class_list) == 2:
+    if len(object_list) == 2:
         pass
-    elif len(class_list) == 3:
-        if type(class_list[2]) == "list":
-            class_list[2] = assemble_class_tree(class_list[2])
-        if class_list[1] == "and":
-            clss = BinAnd(class_list[0], class_list[2])
-        elif class_list[1] == "or":
-            clss = BinOr(class_list[0], class_list[2])
-    return clss
+    elif len(object_list) == 3:
+        if object_list[1] == "&":
+            klass = BinAnd(object_list[0], object_list[2])
+        elif object_list[1] == "/":
+            klass = BinOr(object_list[0], object_list[2])
+    return klass
 
 
-def solve_expression(cl):
-    return cl.evaluate()
+def solve_expression(final_object):
+    return final_object.evaluate()
 
 
-splexp = splice_expression(lssrc)
-tree = assemble_tree(splexp, 0, len(splexp))
-cl = assemble_class_tree(tree)
+def main():
+    source = input("> ")
+    source_list = list(source)
+    spliced_expression = splice_expression(source_list, operators)
+    tree = assemble_tree(spliced_expression, 0, len(spliced_expression))
+    final_object = assemble_object_tree(tree)
 
-print(solve_expression(cl))
+    print(solve_expression(final_object))
+
+
+if __name__ == '__main__':
+    main()
