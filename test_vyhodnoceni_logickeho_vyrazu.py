@@ -1,6 +1,6 @@
 import unittest
 import os
-from vyhodnoceni_logickeho_vyrazu import *
+from vyhodnoceni_vyrazu import *
 
 
 class TestVyhodnoceni(unittest.TestCase):

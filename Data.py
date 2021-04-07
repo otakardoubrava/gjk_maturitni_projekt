@@ -1,6 +1,10 @@
-pins = {1: 1, 2: 0, 3: 1, 4: 1}
-variable_names = {"a", "b", "c"}
-variable_values = {"a": 3, "b": 1, "c": 4}
+"""@package Data.py
+Tento modoul slouží pro deklaraci globálně používaných výčtů speciálních znaků, operátorů a příkazů.
+Obsahuje také množinu názvů proměnných a slovník jejich hodnot.
+"""
+
+variable_names = {"a"}
+variable_values = {"a": 0}
 known_characters = {"&", "|", "(", ")", "!", "=", "+", "-", "*", "/", "<", ">"}
-operators = {"&&", "||", "!", "=", "!=", "<=", ">=", "<", ">", "+", "-", "*", "/"}
-commands = {"if", "assign", "whl", "pt"}
+operators = {"&", "|", "||", "!", "=", "!=", "<=", ">=", "<", ">", "+", "-", "*", "/"}
+commands = {"if", "assign", "whl", "pt", "lp", "brk"}

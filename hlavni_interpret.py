@@ -1,10 +1,23 @@
+"""@package hlavni_interpret.py
+Hlavní modul celého interpreteru. Parsuje vstupní řetězec jednotlivé statementy, které ukládá postupně do seznamu
+(statement_list). Skript dále hledá podmíněné části kódu (části pod podmínkou, nebo
+cyklem) a tvoří z nich seznam vnořený do statement_list.
+Modul kontroluje jestli statementy dávají smyls.
+Konečný sezanm statement_list na konci předává modulu provedeni_statementu.py
+
+"""
+
 import sys
 from Data import *
 from provedeni_statementu import execute
 
 
 def splice_to_statements(source_code_list):
-    #seka z puvodniho stringu jednotlve statementy
+    """
+    funkce pro parsování vstupního řetězce na statementy
+    :param source_code_list:
+    :return lines:
+    """
     line = ""
     lines = []
     i = 0
@@ -34,7 +47,12 @@ def splice_to_statements(source_code_list):
 
 
 def create_statement(line):
-    #tvori statement typu 'COMMAND EXPRESION' a kontroluje jestli dava smysl
+    """
+    funkce pro tvorbu statementu typu 'COMMAND EXPRESION' a kontrolu, jestli statement dává smysl
+    pokud statement smysl nedává, vytiskne do konsole 'syntax err' a ukončí skript
+    :param line:
+    :return statement:
+    """
     line_list = list(line)
     statement = ""
     word = ""
@@ -71,6 +89,12 @@ def create_statement(line):
 
 
 def splice_statements(statements):
+    """
+    dodatečná funkce pro tvorbu statementů, stále dokola spouští funkci create_statement a předkládá jí další z prvků
+    seznamu statementů
+    :param statements:
+    :return statement_list:
+    """
     statement_list = []
 
     for i in range(0, len(statements)):
@@ -82,6 +106,14 @@ def splice_statements(statements):
 
 
 def assemble_tree(spliced_statements, beg, end):
+    """
+    Funkce tvoří ze statementů mezi závorkami vnořený seznam, pokud se v kódu vyskytují závorky vnořené,
+    funkce se spustí rekurzivně ppouze na vnořený kus kódu.
+    :param spliced_statements:
+    :param beg:
+    :param end:
+    :return tree:
+    """
     tree = []
     bracket_list = []
 
@@ -103,8 +135,13 @@ def assemble_tree(spliced_statements, beg, end):
     return tree
 
 
-def parse_input():
-    source_code = input("> ")
+def parse_input(source_code):
+    """
+    Stará se o spouštění parsovacích funkcí ve správném pořadí
+    vrací konečný seznam příkazů. jako argumnet si bere vstupní řetězec
+    :param source_code:
+    :return statement_list:
+    """
     source_code_list = list(source_code)
 
     line_list = splice_to_statements(source_code_list)
@@ -115,10 +152,16 @@ def parse_input():
     return statement_list
 
 
-
-
+def main(instructions):
+    """
+    hlavní funkce, předává vstupní řetězec funkci parse_input a výsledný seznam příkazů předává funkci execute z modulu
+    provedeni_statementu.py
+    :param instructions:
+    """
+    statement_list = parse_input(instructions)
+    execute(statement_list)
 
 
 if __name__ == "__main__":
-    statement_list = parse_input()
-    execute(statement_list)
+    instructions = input("> ")
+    main(instructions)

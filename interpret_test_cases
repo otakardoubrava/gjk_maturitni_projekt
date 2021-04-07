@@ -1,0 +1,28 @@
+a=b;c=d;,['a=b', 'c=d']
+if a=b{c=d;f=g},['if a=b', '{', 'c=d', 'f=g', '}']
+a=b;if b=c{if a=c{g=h}},['a=b', 'if b=c', '{', 'if a=c', '{', 'g=h', '}', '}']
+if a+b=c+f{a=b;},['if a+b=c+f', '{', 'a=b', '}']
+if a=3{if b=4{c=0}if b=5{c=1}},['if a=3', '{', 'if b=4', '{', 'c=0', '}', 'if b=5', '{', 'c=1', '}', '}']
+a=a+1;,['a=a+1']
+if a+1=b+3{c=yada},['if a+1=b+3', '{', 'c=yada', '}']
+if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{b=1}}}}}}}}}},['if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'b=1', '}', '}', '}', '}', '}', '}', '}', '}', '}', '}']
+
+
+a=b;c=d;,['assign a~b', 'assign c~d']
+if a=b{c=d;f=g},['if a=b', '{', 'assign c~d', 'assign f~g', '}']
+a=b;if b=c{if a=c{g=h}},['assign a~b', 'if b=c', '{', 'if a=c', '{', 'assign g~h', '}', '}']
+if a+b=c+f{a=b;},['if a+b=c+f', '{', 'assign a~b', '}']
+if a=3{if b=4{c=0}if b=5{c=1}},['if a=3', '{', 'if b=4', '{', 'assign c~0', '}', 'if b=5', '{', 'assign c~1', '}', '}']
+a=a+1;,['assign a~a+1']
+if a+1=b+3{c=yada},['if a+1=b+3', '{', 'assign c~yada', '}']
+if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{b=1}}}}}}}}}},['if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'if a=1', '{', 'assign b~1', '}', '}', '}', '}', '}', '}', '}', '}', '}', '}']
+
+
+a=b;c=d;,['assign a~b', 'assign c~d']
+if a=b{c=d;f=g},['if a=b', ['assign c~d', 'assign f~g']]
+a=b;if b=c{if a=c{g=h}},['assign a~b', 'if b=c', ['if a=c', ['assign g~h']]]
+if a+b=c+f{a=b;},['if a+b=c+f', ['assign a~b']]
+if a=3{if b=4{c=0}if b=5{c=1}},['if a=3', ['if b=4', ['assign c~0'], 'if b=5', ['assign c~1']]]
+a=a+1;,['assign a~a+1']
+if a+1=b+3{c=yada},['if a+1=b+3', ['assign c~yada']]
+if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{if a=1{b=1}}}}}}}}}},['if a=1', ['if a=1', ['if a=1', ['if a=1', ['if a=1', ['if a=1', ['if a=1', ['if a=1', ['if a=1', ['if a=1', ['assign b~1']]]]]]]]]]]
